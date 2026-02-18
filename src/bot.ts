@@ -7,7 +7,11 @@ import * as http from 'http';
 // CONFIGURATION
 // ============================================================
 const BOT_TOKEN = process.env.BOT_TOKEN || 'YOUR_BOT_TOKEN_HERE';
-const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || ''; // For admin notifications
+const ADMIN_CHAT_ID = process.env.ADMIN_CHAT_ID || '1636477527'; // Your admin chat ID
+
+// Store conversation mappings (customer -> admin message ID)
+const conversationMap = new Map<string, number>(); // customerChatId -> adminMessageId
+const adminMessageMap = new Map<number, string>(); // adminMessageId -> customerChatId
 
 // ============================================================
 // TYPES
@@ -294,21 +298,105 @@ bot.action(/admin_(.+)/, async (ctx) => {
     { parse_mode: 'Markdown' }
   );
 
-  // Notify admin (if admin chat ID is configured)
+  // Forward entire conversation to admin
   if (ADMIN_CHAT_ID) {
     try {
-      await ctx.telegram.sendMessage(
+      const customerChatId = ctx.chat?.id.toString() || '';
+      
+      // Forward order details to admin
+      const adminMsg = await ctx.telegram.sendMessage(
         ADMIN_CHAT_ID,
         `🚨 *Customer Needs Help*\n\n` +
-        `Order: \`${orderId}\`\n` +
-        `User: ${user?.first_name} ${user?.last_name || ''}\n` +
-        `Username: @${user?.username || 'N/A'}\n` +
-        `Chat ID: \`${ctx.chat?.id}\``,
+        `📦 Order: \`${orderId}\`\n` +
+        `👤 Customer: ${user?.first_name} ${user?.last_name || ''}\n` +
+        `📱 Username: @${user?.username || 'N/A'}\n` +
+        `🆔 Chat ID: \`${customerChatId}\`\n\n` +
+        `💬 *Reply to this message to respond to the customer*`,
         { parse_mode: 'Markdown' }
       );
+      
+      // Store mapping for reply routing
+      if (adminMsg.message_id) {
+        conversationMap.set(customerChatId, adminMsg.message_id);
+        adminMessageMap.set(adminMsg.message_id, customerChatId);
+        console.log(`🔗 Linked customer ${customerChatId} to admin message ${adminMsg.message_id}`);
+      }
+      
+      // Also forward the order info so admin has context
+      const order = getOrder(orderId);
+      if (order) {
+        await ctx.telegram.sendMessage(
+          ADMIN_CHAT_ID,
+          `📋 *Order Details for Reference:*\n\n` +
+          formatOrderSummary(order),
+          { parse_mode: 'Markdown' }
+        );
+      }
+      
     } catch (error) {
       console.error('❌ Failed to notify admin:', error);
     }
+  }
+});
+
+// Handle admin replies (when admin replies to a forwarded customer message)
+bot.on('message', async (ctx) => {
+  // Only process messages from admin
+  if (ctx.chat?.id.toString() !== ADMIN_CHAT_ID) return;
+  
+  const message = ctx.message;
+  if (!message || !('text' in message)) return; // Only handle text messages from admin
+  
+  // Check if this is a reply to a customer conversation
+  const replyToMessage = message.reply_to_message;
+  if (!replyToMessage) return;
+  
+  const repliedToId = replyToMessage.message_id;
+  const customerChatId = adminMessageMap.get(repliedToId);
+  
+  const adminText = message.text;
+  
+  if (!customerChatId) {
+    // Check if it's a reply to the order details message
+    // We need to find the parent message
+    for (const [adminMsgId, custId] of adminMessageMap.entries()) {
+      if (Math.abs(adminMsgId - repliedToId) <= 2) { // Within 2 messages
+        console.log(`📨 Admin replied to related message, routing to customer ${custId}`);
+        
+        try {
+          await ctx.telegram.sendMessage(
+            custId,
+            `👤 *Admin:*\n${adminText}`,
+            { parse_mode: 'Markdown' }
+          );
+          
+          // Confirm to admin
+          await ctx.reply('✅ Message sent to customer!');
+          console.log(`✅ Admin reply forwarded to customer ${custId}`);
+        } catch (error) {
+          console.error('❌ Failed to forward admin reply:', error);
+          await ctx.reply('❌ Failed to send message to customer');
+        }
+        return;
+      }
+    }
+    return;
+  }
+  
+  // Forward admin's reply to customer
+  try {
+    await ctx.telegram.sendMessage(
+      customerChatId,
+      `👤 *Admin:*\n${adminText}`,
+      { parse_mode: 'Markdown' }
+    );
+    
+    // Confirm to admin
+    await ctx.reply('✅ Message sent to customer!');
+    console.log(`✅ Admin reply forwarded to customer ${customerChatId}`);
+  } catch (error) {
+    console.error('❌ Failed to forward admin reply:', error);
+    await ctx.reply('❌ Failed to send message to customer');
   }
 });
 

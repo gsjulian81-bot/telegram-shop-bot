@@ -1,0 +1,76 @@
+{
+  "ORDER_12345": {
+    "orderId": "ORDER_12345",
+    "customerName": "Aung Kyaw",
+    "items": [
+      {
+        "name": "T-Shirt (Black)",
+        "qty": 2,
+        "price": 10000,
+        "image": "https://placehold.co/400x400?text=T-Shirt+Black"
+      },
+      {
+        "name": "Cap (White)",
+        "qty": 1,
+        "price": 5000,
+        "image": "https://placehold.co/400x400?text=Cap+White"
+      }
+    ],
+    "shippingFee": 2000,
+    "deliveryAddress": "No.123, Pyay Road, Kamayut Township, Yangon",
+    "total": 27000,
+    "currency": "MMK",
+    "paymentMethods": [
+      { "name": "KBZ Pay", "details": "KBZ Pay Number: 09-123-456-789\nAccount Name: USA Collection" },
+      { "name": "AYA Pay", "details": "AYA Pay Number: 09-987-654-321\nAccount Name: USA Collection" },
+      { "name": "Wave Pay", "details": "Wave Pay Number: 09-456-789-123\nAccount Name: USA Collection" }
+    ]
+  },
+  "ORDER_TEST": {
+    "orderId": "ORDER_TEST",
+    "customerName": "Thidar Aye",
+    "items": [
+      {
+        "name": "Myanmar Traditional Shirt",
+        "qty": 1,
+        "price": 15000,
+        "image": "https://placehold.co/400x400?text=Traditional+Shirt"
+      }
+    ],
+    "shippingFee": 1500,
+    "deliveryAddress": "No.456, Insein Road, Hlaing Township, Yangon",
+    "total": 16500,
+    "currency": "MMK",
+    "paymentMethods": [
+      { "name": "KBZ Pay", "details": "KBZ Pay Number: 09-123-456-789\nAccount Name: USA Collection" },
+      { "name": "AYA Pay", "details": "AYA Pay Number: 09-987-654-321\nAccount Name: USA Collection" }
+    ]
+  },
+  "ORDER_99999": {
+    "orderId": "ORDER_99999",
+    "customerName": "Min Thu",
+    "items": [
+      {
+        "name": "Summer Dress",
+        "qty": 1,
+        "price": 25000,
+        "image": "https://placehold.co/400x400?text=Summer+Dress"
+      },
+      {
+        "name": "Handbag",
+        "qty": 1,
+        "price": 18000,
+        "image": "https://placehold.co/400x400?text=Handbag"
+      }
+    ],
+    "shippingFee": 2500,
+    "deliveryAddress": "No.789, University Avenue, Bahan Township, Yangon",
+    "total": 45500,
+    "currency": "MMK",
+    "paymentMethods": [
+      { "name": "KBZ Pay", "details": "KBZ Pay Number: 09-123-456-789\nAccount Name: USA Collection" },
+      { "name": "AYA Pay", "details": "AYA Pay Number: 09-987-654-321\nAccount Name: USA Collection" },
+      { "name": "Wave Pay", "details": "Wave Pay Number: 09-456-789-123\nAccount Name: USA Collection" }
+    ]
+  }
+}

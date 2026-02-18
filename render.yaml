@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: telegram-shop-bot
+    runtime: node
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    plan: free
+    envVars:
+      - key: BOT_TOKEN
+        sync: false  # Set this in Render dashboard
+      - key: ADMIN_CHAT_ID
+        sync: false  # Optional: Set for admin notifications
+    healthCheckPath: /health

@@ -1,0 +1,22 @@
+{
+  "name": "telegram-shop-bot",
+  "version": "1.0.0",
+  "description": "E-commerce Telegram bot for Myanmar - Order checkout with KBZPay, AYA Pay, Wave Pay",
+  "main": "dist/bot.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/bot.js",
+    "dev": "ts-node src/bot.ts"
+  },
+  "keywords": ["telegram", "bot", "ecommerce", "myanmar", "kbzpay"],
+  "author": "Nay",
+  "license": "MIT",
+  "dependencies": {
+    "telegraf": "^4.16.3",
+    "@types/node": "^20.14.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.4.5",
+    "ts-node": "^10.9.2"
+  }
+}
